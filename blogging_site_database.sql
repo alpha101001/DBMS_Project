@@ -707,4 +707,41 @@ dbms_output.put_line('Which is ' || r || '~s user id.');
 end;
 /
 
+commit; ------use to commit data in the database
+
+
+
+-----DDL trigger for keeping records about changes--------
+
+CREATE TABLE db_records (
+    ddl_date date,
+    ddl_user varchar2(15),
+    object_created varchar2(15),
+    object_name varchar2(15),
+    ddl_operation varchar2(15)
+);
+
+
+Create or replace trigger blog_db_records
+AFTER DDL on schema
+BEGIN
+insert into db_records values(
+  sysdate,  ---insert system date
+  sys_context('USERENV','CURRENT_USER'), --(namespace and perameter)
+  Ora_dict_obj_type, --ddl operation type
+  ora_dict_obj_name,   --name of the object
+  ora_sysevent   ---ddl operation name
+  
+);
+dbms_output.put_line('You are not allowed to make changes');
+dbms_output.put_line('You must rollback otherwise you will be caught');
+end;
+/
+drop table dummy_table;
+create table dummy_table (
+  d_num integer
+);
+insert into dummy_table values (8);
+
+
 
